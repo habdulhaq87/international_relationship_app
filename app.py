@@ -18,16 +18,19 @@ data = {
 
 df = pd.DataFrame(data)
 
-# User input for filtering
+# Sidebar inputs for filtering
 st.sidebar.header("Find Your Match")
 selected_country = st.sidebar.selectbox("Select Country", ["All"] + df["Country"].unique().tolist())
 selected_interest = st.sidebar.text_input("Enter an Interest (optional)")
 
 # Filter data
-filtered_data = df[
-    (df["Country"] == selected_country if selected_country != "All" else True)
-    & (df["Interests"].str.contains(selected_interest, case=False, na=False) if selected_interest else True)
-]
+filtered_data = df.copy()
+
+if selected_country != "All":
+    filtered_data = filtered_data[filtered_data["Country"] == selected_country]
+
+if selected_interest:
+    filtered_data = filtered_data[filtered_data["Interests"].str.contains(selected_interest, case=False, na=False)]
 
 # Display filtered data
 st.subheader("Available Matches")
