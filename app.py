@@ -8,23 +8,12 @@ st.set_page_config(page_title="International Relationship App", layout="wide")
 st.title("🌍 International Relationship App")
 st.write("Build meaningful relationships across the globe! Use the filters to find individuals who share your interests, speak your language, or are from specific regions.")
 
-# Simulated data
-data = {
-    "Name": ["Alex", "Maria", "Li Wei", "Amina", "John", "Hiro", "Fatima", "Carlos"],
-    "Country": ["USA", "Spain", "China", "Kenya", "Canada", "Japan", "Morocco", "Argentina"],
-    "Interests": [
-        "Technology, Sports", "Music, Art", "Cooking, Movies", "Travel, Books",
-        "Gaming, Fitness", "Anime, Technology", "Cooking, Travel", "Sports, Music"
-    ],
-    "Languages Spoken": [
-        "English", "Spanish", "Mandarin", "Swahili, English", "English, French",
-        "Japanese, English", "Arabic, French", "Spanish, English"
-    ],
-    "Age": [25, 30, 22, 28, 35, 24, 27, 32],
-    "Availability": ["Evenings", "Mornings", "Weekends", "Weekdays", "Flexible", "Evenings", "Flexible", "Weekends"],
-}
-
-df = pd.DataFrame(data)
+# Load data from the CSV file in the main repository
+try:
+    df = pd.read_csv("database.csv")
+except FileNotFoundError:
+    st.error("The database.csv file was not found in the repository. Please make sure it exists in the main directory.")
+    st.stop()
 
 # Sidebar inputs for filtering
 st.sidebar.header("Find Your Match")
