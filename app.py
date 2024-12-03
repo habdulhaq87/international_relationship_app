@@ -81,28 +81,7 @@ filtered_data = filtered_data[
 if availability:
     filtered_data = filtered_data[filtered_data["Availability"].isin(availability)]
 
-# Display filtered data
-st.subheader("🎯 Matches Found")
-if not filtered_data.empty:
-    st.write(f"Found {len(filtered_data)} match(es):")
-    # Display each user profile as a styled card
-    for _, row in filtered_data.iterrows():
-        st.markdown(
-            f"""
-            <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin: 10px 0; background-color: #f9f9f9;">
-                <h4 style="margin-bottom: 5px; color: #4CAF50;">{row["Name"]} ({row["Age"]} years old)</h4>
-                <p style="margin: 5px 0;"><strong>Country:</strong> {row["Country"]}</p>
-                <p style="margin: 5px 0;"><strong>Languages Spoken:</strong> {row["Languages Spoken"]}</p>
-                <p style="margin: 5px 0;"><strong>Interests:</strong> {row["Interests"]}</p>
-                <p style="margin: 5px 0;"><strong>Availability:</strong> {row["Availability"]}</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-else:
-    st.write("No matches found. Try adjusting the filters.")
-
-# Display the map of users
+# Display the map of users at the top
 st.subheader("🗺️ User Locations")
 if not filtered_data.empty and filtered_data[["Latitude", "Longitude"]].notnull().all().any():
     # Create a pydeck map
@@ -129,6 +108,27 @@ if not filtered_data.empty and filtered_data[["Latitude", "Longitude"]].notnull(
     ))
 else:
     st.write("No map data available for the selected filters.")
+
+# Display filtered data below the map
+st.subheader("🎯 Matches Found")
+if not filtered_data.empty:
+    st.write(f"Found {len(filtered_data)} match(es):")
+    # Display each user profile as a styled card
+    for _, row in filtered_data.iterrows():
+        st.markdown(
+            f"""
+            <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin: 10px 0; background-color: #f9f9f9;">
+                <h4 style="margin-bottom: 5px; color: #4CAF50;">{row["Name"]} ({row["Age"]} years old)</h4>
+                <p style="margin: 5px 0;"><strong>Country:</strong> {row["Country"]}</p>
+                <p style="margin: 5px 0;"><strong>Languages Spoken:</strong> {row["Languages Spoken"]}</p>
+                <p style="margin: 5px 0;"><strong>Interests:</strong> {row["Interests"]}</p>
+                <p style="margin: 5px 0;"><strong>Availability:</strong> {row["Availability"]}</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+else:
+    st.write("No matches found. Try adjusting the filters.")
 
 # Footer
 st.markdown("---")
