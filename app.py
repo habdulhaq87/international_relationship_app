@@ -110,4 +110,7 @@ if page == "Main App":
 
     # Footer
     st.markdown("---")
-    st.write("© 2024 International Relation
+    st.write("© 2024 International Relationship App - Bringing the world closer together 🌐")
+
+elif page == "Data Entry (Backend)":
+    backend.main()  # Calls the main function in backend.py
