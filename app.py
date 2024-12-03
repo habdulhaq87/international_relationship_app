@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import pydeck as pdk
 
 # Page configuration
 st.set_page_config(page_title="International Relationship App", layout="wide")
@@ -14,6 +15,37 @@ try:
 except FileNotFoundError:
     st.error("The database.csv file was not found in the repository. Please make sure it exists in the main directory.")
     st.stop()
+
+# Geocode each country into latitude and longitude
+country_coords = {
+    "USA": [37.0902, -95.7129],
+    "Spain": [40.4637, -3.7492],
+    "China": [35.8617, 104.1954],
+    "Kenya": [-1.286389, 36.817223],
+    "Canada": [56.1304, -106.3468],
+    "Japan": [36.2048, 138.2529],
+    "Morocco": [31.7917, -7.0926],
+    "Argentina": [-38.4161, -63.6167],
+    "Germany": [51.1657, 10.4515],
+    "Australia": [-25.2744, 133.7751],
+    "Italy": [41.8719, 12.5674],
+    "South Africa": [-30.5595, 22.9375],
+    "Brazil": [-14.2350, -51.9253],
+    "India": [20.5937, 78.9629],
+    "Russia": [61.5240, 105.3188],
+    "France": [46.6034, 1.8883],
+    "South Korea": [35.9078, 127.7669],
+    "Netherlands": [52.1326, 5.2913],
+    "Nigeria": [9.0820, 8.6753],
+    "UK": [55.3781, -3.4360],
+    "Sweden": [60.1282, 18.6435],
+    "Mexico": [23.6345, -102.5528],
+    "Egypt": [26.8206, 30.8025],
+    "Turkey": [38.9637, 35.2433],
+}
+
+df["Latitude"] = df["Country"].map(lambda x: country_coords[x][0] if x in country_coords else None)
+df["Longitude"] = df["Country"].map(lambda x: country_coords[x][1] if x in country_coords else None)
 
 # Sidebar inputs for filtering
 st.sidebar.header("Find Your Match")
@@ -69,6 +101,34 @@ if not filtered_data.empty:
         )
 else:
     st.write("No matches found. Try adjusting the filters.")
+
+# Display the map of users
+st.subheader("🗺️ User Locations")
+if not filtered_data.empty and filtered_data[["Latitude", "Longitude"]].notnull().all().any():
+    # Create a pydeck map
+    map_data = filtered_data[["Latitude", "Longitude", "Name"]].dropna()
+    st.pydeck_chart(pdk.Deck(
+        map_style="mapbox://styles/mapbox/light-v9",
+        initial_view_state=pdk.ViewState(
+            latitude=0,  # Center the map on the world
+            longitude=0,
+            zoom=1.5,
+            pitch=0,
+        ),
+        layers=[
+            pdk.Layer(
+                "ScatterplotLayer",
+                data=map_data,
+                get_position="[Longitude, Latitude]",
+                get_radius=500000,
+                get_fill_color=[0, 128, 255, 160],
+                pickable=True,
+            )
+        ],
+        tooltip={"text": "{Name}"}
+    ))
+else:
+    st.write("No map data available for the selected filters.")
 
 # Footer
 st.markdown("---")
