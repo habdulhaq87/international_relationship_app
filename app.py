@@ -9,54 +9,27 @@ st.set_page_config(page_title="International Relationship App", layout="wide")
 st.title("🌍 International Relationship App")
 st.write("Build meaningful relationships across the globe! Use the filters to find individuals who share your interests, speak your language, or are from specific regions.")
 
-# Load data from the CSV file in the main repository
+# Load user data and country coordinates
 try:
-    df = pd.read_csv("database.csv")
-except FileNotFoundError:
-    st.error("The database.csv file was not found in the repository. Please make sure it exists in the main directory.")
+    user_data = pd.read_csv("database.csv")
+    country_data = pd.read_csv("country.csv")
+except FileNotFoundError as e:
+    st.error(f"Error: {e}")
     st.stop()
 
-# Geocode each country into latitude and longitude
-country_coords = {
-    "USA": [37.0902, -95.7129],
-    "Spain": [40.4637, -3.7492],
-    "China": [35.8617, 104.1954],
-    "Kenya": [-1.286389, 36.817223],
-    "Canada": [56.1304, -106.3468],
-    "Japan": [36.2048, 138.2529],
-    "Morocco": [31.7917, -7.0926],
-    "Argentina": [-38.4161, -63.6167],
-    "Germany": [51.1657, 10.4515],
-    "Australia": [-25.2744, 133.7751],
-    "Italy": [41.8719, 12.5674],
-    "South Africa": [-30.5595, 22.9375],
-    "Brazil": [-14.2350, -51.9253],
-    "India": [20.5937, 78.9629],
-    "Russia": [61.5240, 105.3188],
-    "France": [46.6034, 1.8883],
-    "South Korea": [35.9078, 127.7669],
-    "Netherlands": [52.1326, 5.2913],
-    "Nigeria": [9.0820, 8.6753],
-    "UK": [55.3781, -3.4360],
-    "Sweden": [60.1282, 18.6435],
-    "Mexico": [23.6345, -102.5528],
-    "Egypt": [26.8206, 30.8025],
-    "Turkey": [38.9637, 35.2433],
-}
-
-df["Latitude"] = df["Country"].map(lambda x: country_coords[x][0] if x in country_coords else None)
-df["Longitude"] = df["Country"].map(lambda x: country_coords[x][1] if x in country_coords else None)
+# Merge user data with country coordinates
+user_data = user_data.merge(country_data, on="Country", how="left")
 
 # Sidebar inputs for filtering
 st.sidebar.header("Find Your Match")
-selected_country = st.sidebar.selectbox("Select Country", ["All"] + sorted(df["Country"].unique().tolist()))
-selected_language = st.sidebar.multiselect("Select Languages Spoken", sorted(set(", ".join(df["Languages Spoken"]).split(", "))))
+selected_country = st.sidebar.selectbox("Select Country", ["All"] + sorted(user_data["Country"].unique().tolist()))
+selected_language = st.sidebar.multiselect("Select Languages Spoken", sorted(set(", ".join(user_data["Languages Spoken"]).split(", "))))
 selected_interest = st.sidebar.text_input("Enter an Interest (optional)")
-age_range = st.sidebar.slider("Select Age Range", min_value=min(df["Age"]), max_value=max(df["Age"]), value=(min(df["Age"]), max(df["Age"])))
-availability = st.sidebar.multiselect("Select Availability", sorted(df["Availability"].unique()))
+age_range = st.sidebar.slider("Select Age Range", min_value=min(user_data["Age"]), max_value=max(user_data["Age"]), value=(min(user_data["Age"]), max(user_data["Age"])))
+availability = st.sidebar.multiselect("Select Availability", sorted(user_data["Availability"].unique()))
 
 # Filter data
-filtered_data = df.copy()
+filtered_data = user_data.copy()
 
 # Filter by country
 if selected_country != "All":
